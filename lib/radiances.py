@@ -115,12 +115,14 @@ if __name__=="__main__":
     axis1.set_xlabel('radiance $(W\,m^{-2}\,sr^{-1})$')
     axis1.set_ylabel('height (km)')
     axis1.legend(numpoints=1,loc='best')
+    fig1.savefig('rad_updn.png')
 
     fig2,axis2=plt.subplots(1,1)
     axis2.plot(up-down,height*0.001,'b-',lw=5)
     axis2.set_title('net upward radiance')
     axis2.set_xlabel('net upward radiance $(W\,m^{-2}\,sr^{-1})$')
     axis2.set_ylabel('height (km)')
+    fig1.savefig('rad_net.png')
 
     plt.show()
 

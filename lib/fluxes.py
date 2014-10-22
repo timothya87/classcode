@@ -73,12 +73,15 @@ if __name__=="__main__":
     axis1.set_xlabel('flux $(W\,m^{-2})$')
     axis1.set_ylabel('height (km)')
     axis1.legend(numpoints=1,loc='best')
+    fig1.savefig('flux_updn.png')
 
+    
     fig2,axis2=plt.subplots(1,1)
     axis2.plot(up-down,height*0.001,'b-',lw=5)
     axis2.set_title('net upward flux')
     axis2.set_xlabel('net upward flux $(W\,m^{-2})$')
     axis2.set_ylabel('height (km)')
+    fig2.savefig('flux_net.png')
 
     dT_dt=heating_rate(up - down,height,rho)
     fig3,axis3=plt.subplots(1,1)
@@ -90,6 +93,7 @@ if __name__=="__main__":
     axis3.set_title('heating rate in K/day')
     axis3.set_xlabel('heating rate (K/day)')
     axis3.set_ylabel('height (km)')
+    fig3.savefig('flux_heating.png')
 
 
     plt.show()

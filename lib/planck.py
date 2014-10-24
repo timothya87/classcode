@@ -1,28 +1,19 @@
 import numpy as np
 
-h=6.63e-34  #planck's constant (J s)
-kb=1.38e-23 # Boltzman's constant (J K^{-1})
+c=2.99792458e+08  #m/s -- speed of light in vacumn
+h=6.62606876e-34  #J s  -- Planck's constant
+kb=1.3806503e-23  # J/K  -- Boltzman's constant
 c=3.e8  #speed of light (m/s)
+c1=2.*h*c**2.
+c2=h*c/(kb*Temp)
 
 __version__="$Id: planck.py,v 1.1 2006/02/21 01:49:59 phil Exp phil $"
-
-def WHplanck(wavel,Temp):
-    """
-       input: wavelength in meters, Temp in K
-       output: blackbody radiance in W/m^2/m/sr
-    """
-    c1=3.74e-16  #W m^2
-    c2=1.44e-2  #m K
-    Blambda=c1/np.pi/(wavel**5.*(np.exp(c2/(wavel*Temp)) -1)) 
-    return Blambda
 
 def planckDeriv(wavel,Temp):
     """
        input: wavel in m, Temp in K
        output: dBlambda/dlambda  W/m^2/m/sr/m
     """
-    c1=3.74e-16 # W m^2
-    c2=1.44e-2  #m K
     expterm=np.exp(c2/(wavel*Temp))
     deriv=c1/np.pi*wavel**(-6.)*(expterm -1)**(-2.)*c2/Temp**2.*expterm
     return deriv           
@@ -33,8 +24,6 @@ def planckwavelen(wavel,Temp):
        input: wavelength (m), Temp (K)
        output: planck function W/m^2/m/sr
     """
-    c1=2.*h*c**2.
-    c2=h*c/kb
     Blambda=c1/(wavel**5.*(np.exp(c2/(wavel*Temp)) -1))
     return Blambda
 
@@ -43,8 +32,6 @@ def planckfreq(freq,Temp):
       input: freq (Hz), Temp (K)
       output: planck function in W/m^2/Hz/sr
     """
-    c1=2.*h/c**2.
-    c2=h/(kb*Temp)
     Bfreq=c1*freq**3./(np.exp(c2*freq) -1)
     return Bfreq
 
@@ -53,20 +40,14 @@ def planckwavenum(waven,Temp):
       input: wavenumber (m^{-1}), Temp (K)
       output: planck function in W/m^2/m^{-1}/sr
     """
-    h=6.63e-34
-    c=3.e8
-    c1=2.*h*c**2.
-    kb=1.38e-23
-    c2=h*c/(kb*Temp)
     Bwaven=c1*waven**3./(np.exp(c2*waven) -1)
     return Bwaven
 
-
 def planckInvert(wavel,Blambda):
-    #note this is approximate!
-    c1=3.74e-16
-    c2=1.44e-2
-    Tbright=c2/(wavel*(np.log(c1) -np.log(np.pi*wavel**5.) - np.log(Blambda)))
+    """input wavelength in m and Blambda in W/m^2/m, output
+    output brightness temperature in K
+    """
+    Tbright=c2/(wavel*np.log(c1/(wavel**5.*Blambda) + 1.))
     return Tbright
 
 def planckInt(wavel,Temp):

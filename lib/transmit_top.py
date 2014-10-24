@@ -56,7 +56,7 @@ if __name__=="__main__":
     #  I played around with the k values -- multiplying by 5 gave me
     #  weighting functions that peaked at the right height
     #
-    k_lambda=np.array([0.005,0.010,0.015,0.020,0.025,0.030,0.035])*5.  
+    k_lambda=np.array([0.002,0.003,0.006,0.010,0.012,0.016,0.020])*5.  
     legend_string=["%5.3f" % item for item in k_lambda]
     #
     # make a list of tuples of k_lambda and its label
@@ -66,6 +66,7 @@ if __name__=="__main__":
     #
     #  find the height at mid-layer
     #
+    plt.close('all')
     mid_height=(height[1:] + height[:-1])/2.
     fig1,axis1=plt.subplots(1,1)
     fig2,axis2=plt.subplots(1,1)
@@ -88,7 +89,9 @@ if __name__=="__main__":
     axis3.legend(loc='best')
     axis_list=[axis1,axis2,axis3]
     [the_axis.set_ylabel('height (km)') for the_axis in axis_list]
-    
+    fig1.savefig('transmit_opticaldepth.png')
+    fig2.savefig('transmit_top.png')
+    fig3.savefig('transmit_weights.png')
     plt.show()
 
     

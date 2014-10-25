@@ -1,10 +1,12 @@
+"""
+   version 1  2014/10/25
+"""
+
 import numpy as np
 
 h=6.63e-34  #planck's constant (J s)
 kb=1.38e-23 # Boltzman's constant (J K^{-1})
 c=3.e8  #speed of light (m/s)
-
-__version__="$Id: planck.py,v 1.1 2006/02/21 01:49:59 phil Exp phil $"
 
 def WHplanck(wavel,Temp):
     """

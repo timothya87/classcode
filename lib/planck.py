@@ -21,6 +21,16 @@ def WHplanck(wavel,Temp):
     Blambda=c1/np.pi/(wavel**5.*(np.exp(c2/(wavel*Temp)) -1)) 
     return Blambda
 
+def WHplanck(wavel,Temp):
+    """
+       input: wavelength in meters, Temp in K
+       output: blackbody radiance in W/m^2/m/sr
+    """
+    c1=3.74e-16  #W m^2
+    c2=1.44e-2  #m K
+    Blambda=c1/np.pi/(wavel**5.*(np.exp(c2/(wavel*Temp)) -1)) 
+    return Blambda
+
 def planckDeriv(wavel,Temp):
     """
        input: wavel in m, Temp in K

@@ -11,7 +11,6 @@ c=3.e8  #speed of light (m/s)
 c2=h*c/kb
 sigma=2.*np.pi**5.*kb**4./(15*h**3.*c**2.)
 
-def WHplanck(wavel,Temp):
     """
        input: wavelength in meters, Temp in K
        output: blackbody radiance in W/m^2/m/sr
@@ -20,7 +19,6 @@ def WHplanck(wavel,Temp):
     c2=1.44e-2  #m K
     Blambda=c1/np.pi/(wavel**5.*(np.exp(c2/(wavel*Temp)) -1)) 
     return Blambda
-
 def WHplanck(wavel,Temp):
     """
        input: wavelength in meters, Temp in K

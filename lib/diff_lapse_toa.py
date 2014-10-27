@@ -149,7 +149,7 @@ if __name__=="__main__":
         # convert dT_dz to K/km
         #
         axis1.plot(wavelengths,radiances,label=str(dT_dz[index]*1.e3))
-    axis1.set_title('normalized radiances at top of atmosphere for 7 values of dT/dz (K/km)')
+    axis1.set_title('normalized radiances at top of atmosphere for {} values of dT/dz (K/km)'.format(len(dT_dz)))
     axis1.set_ylabel('normalized radiances (no units)')
     axis1.set_xlabel('wavelength (microns)')
     axis1.legend(loc='best')

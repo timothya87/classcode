@@ -6,7 +6,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from planck_function import planckwavelen
+from planck import planckwavelen
 #
 # OrderedDict keeps keys in order
 #
@@ -85,8 +85,8 @@ def top_radiance(tau,Temp,height,T_surf,wavel,k_lambda):
     sfc_rad=planckwavelen(wavel,T_surf)
     up_rad=sfc_rad
     print "-"*60
-    print "wavelength: %8.2f microns" % wavel
-    print "surface radiation: %8.2f W/m^2/micron/sr" % up_rad
+    print "wavelength: %8.2f microns" % (wavel*1.e6)
+    print "surface radiation: %8.2f W/m^2/micron/sr" % (up_rad*1.e-6)
     print "total tau: %8.2f" % tau[-1]
     print "-"*60
     tot_levs=len(tau)
@@ -107,7 +107,6 @@ if __name__=="__main__":
     r_gas=0.01  #kg/kg
     T_surf=300 #K
     p_surf=100.e3 #Pa
-    dT_dz = -7.e-3 #K/km
     dT_dz= np.arange(-9.e-3,-4.e-3,0.5e-3)
     delta_z=25000/7
     num_levels=7
@@ -115,7 +114,7 @@ if __name__=="__main__":
     # try to duplicate weighting functions for WH fig. 4.33
     #
     wavenums=np.linspace(666,766,7)
-    wavelengths=1/wavenums*1.e4  #microns
+    wavelengths=(1/wavenums)*1.e4  #microns
     #
     # we want most absorbing channel at 15 microns, so reverse
     # the order of the wavelengths so that 15 microns is
@@ -135,7 +134,8 @@ if __name__=="__main__":
         rad_dict=OrderedDict()
         for wavel,k_lambda in wavel_k_tup:
             tau=find_tau(r_gas,k_lambda,rho,height)
-            rad_value=top_radiance(tau,Temp,height,T_surf,wavel,k_lambda)
+            #convert wavel to meters
+            rad_value=top_radiance(tau,Temp,height,T_surf,wavel*1.e-6,k_lambda)
             rad_dict[wavel]=rad_value
         rad_profs.append(rad_dict)
 
@@ -145,11 +145,18 @@ if __name__=="__main__":
         wavelengths=the_profile.keys()
         radiances=np.array(the_profile.values())
         radiances=radiances/radiances.mean()
+        #
+        # convert dT_dz to K/km
+        #
         axis1.plot(wavelengths,radiances,label=str(dT_dz[index]*1.e3))
-    axis1.set_title('radiances at top of atmosphere')
-    axis1.set_ylabel('radiance $(W\,m^{-2}\,sr^{-1})$')
+    axis1.set_title('normalized radiances at top of atmosphere for 7 values of dT/dz (K/km)')
+    axis1.set_ylabel('normalized radiances (no units)')
     axis1.set_xlabel('wavelength (microns)')
     axis1.legend(loc='best')
+    fig1.savefig('normalized_radiances.png')
+
+
+    
     plt.show()
 
     

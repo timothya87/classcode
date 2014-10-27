@@ -11,7 +11,10 @@ from planck_function import planckwavelen
 # OrderedDict keeps keys in order
 #
 from collections import OrderedDict
-import seaborn
+try:
+    import seaborn
+except:
+    pass
 
 def hydrostat(T_surf,p_surf,dT_dz,delta_z,num_levels):
     """

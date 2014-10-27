@@ -5,17 +5,9 @@ c=2.99792458e+08  #m/s -- speed of light in vacumn
 h=6.62606876e-34  #J s  -- Planck's constant
 kb=1.3806503e-23  # J/K  -- Boltzman's constant
 c=3.e8  #speed of light (m/s)
+c1=2.*h*c**2.
 c2=h*c/kb
 sigma=2.*np.pi**5.*kb**4./(15*h**3.*c**2.)
-
-__version__="$Id: planck.py,v 1.1 2006/02/21 01:49:59 phil Exp phil $"
-       input: wavelength in meters, Temp in K
-       output: blackbody radiance in W/m^2/m/sr
-    """
-    c1=3.74e-16  #W m^2
-    c2=1.44e-2  #m K
-    Blambda=c1/np.pi/(wavel**5.*(np.exp(c2/(wavel*Temp)) -1)) 
-    return Blambda
 
 def planckDeriv(wavel,Temp):
     """

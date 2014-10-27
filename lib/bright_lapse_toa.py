@@ -169,7 +169,7 @@ if __name__=="__main__":
         axis2.plot(wavelengths,brights,label=str(dT_dz[index]*1.e3))
         
     axis2.set_title('brightness temperatures at top of atmosphere for {} values of dT/dz (K/km)'.format(len(dT_dz)))
-    axis2.set_ylabel('Brightneww temperature (K)')
+    axis2.set_ylabel('Brightness temperature (K)')
     axis2.set_xlabel('wavelength (microns)')
     axis2.legend(loc='best')
     fig2.savefig('brightness.png')

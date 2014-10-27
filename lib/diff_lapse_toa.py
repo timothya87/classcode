@@ -85,9 +85,8 @@ def top_radiance(tau,Temp,height,T_surf,wavel,k_lambda):
     sfc_rad=planckwavelen(wavel,T_surf)
     up_rad=sfc_rad
     print "-"*60
-    print "here is wavelength: ",wavel
     print "wavelength: %8.2f microns" % (wavel*1.e6)
-    print "surface radiation: %8.2f W/m^2/micron/sr" % (up_rad)
+    print "surface radiation: %8.2f W/m^2/micron/sr" % (up_rad*1.e-6)
     print "total tau: %8.2f" % tau[-1]
     print "-"*60
     tot_levs=len(tau)
@@ -146,9 +145,12 @@ if __name__=="__main__":
         wavelengths=the_profile.keys()
         radiances=np.array(the_profile.values())
         radiances=radiances/radiances.mean()
+        #
+        # convert dT_dz to K/km
+        #
         axis1.plot(wavelengths,radiances,label=str(dT_dz[index]*1.e3))
     axis1.set_title('normalized radiances at top of atmosphere for 7 values of dT/dz (K/km)')
-    axis1.set_ylabel('radiance $(W\,m^{-2}\,\mu m^{-1}\,sr^{-1})$')
+    axis1.set_ylabel('normalized radiances (no units)')
     axis1.set_xlabel('wavelength (microns)')
     axis1.legend(loc='best')
     fig1.savefig('normalized_radiances.png')

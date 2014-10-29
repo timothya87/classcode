@@ -1,5 +1,9 @@
 import numpy as np
 from matplotlib import pyplot as plt
+try:
+    import seaborn
+except:
+    pass
 
 def marshall_dist(Dvec,RR):
     """

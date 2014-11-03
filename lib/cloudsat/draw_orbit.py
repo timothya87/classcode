@@ -5,8 +5,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pyhdf.SD
 #
-# read the lat lons from the mat file prepared
-# by readgeo.m
 #
 from readcloudsat import get_geo
 

@@ -1,4 +1,5 @@
 '''
+#http://schubert.atmos.colostate.edu/~cslocum/netcdf_example.html
 NAME
     NetCDF with Python
 PURPOSE

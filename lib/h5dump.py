@@ -5,7 +5,7 @@ import argparse
 import types
 
 def print_attrs(name, obj):
-    print(name)
+    print("item name: ",name,repr(obj))
     for key, val in obj.attrs.iteritems():
         print("    %s: %s" % (key, val))
 
@@ -20,8 +20,8 @@ def dumph5(filename):
     print('-------------------')
     print("attributes for the root file")
     print('-------------------')
-    for key in infile.attrs.keys():
-        print(key)
+    for key,value in infile.attrs.items():
+        print("attribute name: ",key,"--- value: ",value)
     return None
         
 if __name__ == "__main__":

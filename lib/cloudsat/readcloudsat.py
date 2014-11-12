@@ -32,7 +32,7 @@ def get_geo(hdfname):
          output:  
            lat  -- profile latitude in degrees east  (1-D vector)
            lon  -- profile longitude in degrees north (1-D vector)
-           time_vals -- profile times in UTC  (1D vector)
+           time_vals -- profile times as datetime objects (1D vector)
            prof_times -- profile times in seconds since beginning of orbit (1D vector)
            dem_elevation -- surface elevation in meters
     """
@@ -52,7 +52,7 @@ def get_geo(hdfname):
     #this is the start time of the orbit in seconds since Jan 1, 1993
     orbitStart=taiDayOne + taiDelta
     time_vals=[]
-    #now loop throught he radar profile times and convert them to 
+    #now loop throught the radar profile times and convert them to 
     #python datetime objects in utc
     for the_time in var_dict['Profile_time']:
         date_time=orbitStart + datetime.timedelta(seconds=float(the_time))

@@ -2,7 +2,7 @@ import types
 import h5py
 from modismeta_h5 import parseMeta
 from h5dump import dumph5
-import glob
+import glob,os
 
 def output_h5(level1b_file,geom_file,output_name):
     """
@@ -42,18 +42,18 @@ def output_h5(level1b_file,geom_file,output_name):
     the_lon=geom_file['MODIS_Swath_Type_GEO']['Geolocation Fields']['Longitude'][...]
     the_lat=geom_file['MODIS_Swath_Type_GEO']['Geolocation Fields']['Latitude'][...]
 
-    f = h5py.File(output_name, "w")
-    dset = f.create_dataset("lattitude", the_lat.shape, dtype=the_lat.dtype)
-    dset[...]=the_lat[...]
-    dset = f.create_dataset("longitude", the_lon.shape, dtype=the_lon.dtype)
-    dset[...]=the_lon[...]
-    dset = f.create_dataset("channel1", chan1.shape, dtype=chan1.dtype)
-    dset[...]=chan1[...]
-    dset = f.create_dataset("channel31", chan31.shape, dtype=chan31.dtype)
-    dset[...]=chan31[...]
-    metadata=parseMeta(l1b_file)    
-    for the_key in metadata.keys():
-        f.attrs[the_key]=metadata[the_key]
+    with h5py.File(output_name, "w") as f:
+        dset = f.create_dataset("lattitude", the_lat.shape, dtype=the_lat.dtype)
+        dset[...]=the_lat[...]
+        dset = f.create_dataset("longitude", the_lon.shape, dtype=the_lon.dtype)
+        dset[...]=the_lon[...]
+        dset = f.create_dataset("channel1", chan1.shape, dtype=chan1.dtype)
+        dset[...]=chan1[...]
+        dset = f.create_dataset("channel31", chan31.shape, dtype=chan31.dtype)
+        dset[...]=chan31[...]
+        metadata=parseMeta(l1b_file)    
+        for the_key in metadata.keys():
+            f.attrs[the_key]=metadata[the_key]
     return None
     
 if __name__ == "__main__":

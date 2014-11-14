@@ -44,7 +44,7 @@ def planckwavenum(waven,Temp):
     return Bwaven
 
 def planckInvert(wavel,Blambda):
-    """input wavelength in m and Blambda in W/m^2/m, output
+    """input wavelength in m and Blambda in W/m^2/m/sr, output
     output brightness temperature in K
     """
     Tbright=c2/(wavel*np.log(c1/(wavel**5.*Blambda) + 1.))

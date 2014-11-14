@@ -1,6 +1,6 @@
-""""
+"""
    bin modis data into regular latitude and longitude bins   
-""""
+"""
 
 import numpy as np
 

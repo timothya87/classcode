@@ -9,24 +9,25 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 from cloudsat_tool import get_geo
+import os
 
-def draw_orbit(radarFile, lonlim=None, latlim=None, time_step=1000, label_step=2, saveid=0):
+def draw_orbit(radarFile, lonlim=None, latlim=None, time_step=1000, label_step=2, savepng=False):
     """
     ======================================================================
     Plot the orbit info. on a map
     ----------------------------------------------------------------------
-    draw_orbit(radarFile, time_step=1000, label_step=2, saveid=0):
+    draw_orbit(radarFile, time_step=1000, label_step=2, savepng=False):
     ----------------------------------------------------------------------
     Input:
         radarFile: a string specify the location of CloudSat File.
         time_step: how many times (in seconds) each point represents.
         label_step: label_step=n means label every n points.
-        saveid: save the output figure (=1) or not (=0).
+        savepng: save the output figure to folder figures (bool).
     ======================================================================
     """
     if lonlim is None:
         lonlim=[-360, 360]
-    if latlim is None
+    if latlim is None:
         latlim=[-90, 90]
     lat, lon, time_vals, time_seconds, dem_elevation = get_geo(radarFile)
     lat_str=lat-1; lon_str=lon+4 # lat/lon for labels
@@ -59,8 +60,10 @@ def draw_orbit(radarFile, lonlim=None, latlim=None, time_step=1000, label_step=2
     [i.set_linewidth(2) for i in axis.spines.itervalues()]
     title_str='CloudSat Track\nGranule Number: ' + radarFile[-40:-35]
     axis.set_title(title_str, fontsize=14, fontweight='bold')
-    if saveid==1:
-        plt.savefig('_figures/03_CloudSat_track.png', dpi=450, facecolor='w', edgecolor='w',
+    if savepng:
+        if not os.path.exists('figures'):
+            os.mkdir('figures')
+        plt.savefig('figures/03_CloudSat_track.png', dpi=450, facecolor='w', edgecolor='w',
             orientation='portrait', papertype='a4', format='png',
             transparent=True, bbox_inches='tight', pad_inches=0,
             frameon=None)

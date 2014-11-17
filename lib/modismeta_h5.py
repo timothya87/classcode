@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
    class that reads the NASA hdfeos CoreMetadata.0 attribute
    and retrieves the orbitnumber, equator crossing time, 
@@ -6,7 +7,8 @@
 
 import types
 import numpy as np
-import netCDF4
+import h5py
+import argparse
 
 class metaParse:
     def __init__(self,metaDat,altrDat):
@@ -91,13 +93,13 @@ class metaParse:
 
 def parseMeta(filename):
     if type(filename) == types.StringType:
-        infile = Dataset(filename,'r')
-    elif isinstance(filename,netCDF4.Dataset):
+        infile = h5py.File(filename,'r')
+    elif isinstance(filename,h5py._hl.files.File):
         infile=filename
     else:
         raise IOError, "need an netcdf filename or Dataset instance"
-    metaDat=infile.CoreMetadata_0
-    altrDat=infile.ArchiveMetadata_0
+    metaDat=infile.attrs['CoreMetadata.0_GLOSDS']
+    altrDat=infile.attrs['ArchiveMetadata.0_GLOSDS']
     # level-2 files stores GRING data in here
 
     parseIt=metaParse(metaDat,altrDat)
@@ -130,5 +132,8 @@ def dorun(filename=None):
     print parseMeta(filename)
 
 if __name__=='__main__':
-    dorun()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('h5_file',type=str,help='name of h5 file')
+    args=parser.parse_args()
+    dorun(args.h5_file)
     

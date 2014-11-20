@@ -68,7 +68,64 @@ def draw_orbit(radarFile, lonlim=None, latlim=None, time_step=1000, label_step=2
             transparent=True, bbox_inches='tight', pad_inches=0,
             frameon=None)
     plt.show()
-    
+
+def draw_orbit_pha(radarFile, lonlim=None, latlim=None, time_step=1000, label_step=2,fignum=1):
+    """
+    ======================================================================
+    Plot the orbit info. on a map
+    ----------------------------------------------------------------------
+    draw_orbit(radarFile, time_step=1000, label_step=2, savepng=False):
+    ----------------------------------------------------------------------
+    Input:
+        radarFile: a string specify the location of CloudSat File.
+        time_step: how many times (in seconds) each point represents.
+        label_step: label_step=n means label every n points.
+        savepng: save the output figure to folder figures (bool).
+    Output:
+        Returns the basemap instance with the plot
+    ======================================================================
+    """
+    lat, lon, time_vals, time_seconds, dem_elevation = get_geo(radarFile,monotonic_id=1)
+    if lonlim is None:
+        lonlim=[np.amin(lon),np.amax(lon)]
+        if lonlim[0] < -360.:
+            lon[:]=lon[:] + 360.
+            lonlim=[np.amin(lon),np.amax(lon)]
+    if latlim is None:
+        latlim=[np.amin(lat),np.amax(lat)]
+    lat_str=lat-1; lon_str=lon+4 # lat/lon for labels
+    # plot orbit using the radar ground track
+    fig=plt.figure(fignum,figsize=(15, 15))
+    axis=fig.add_subplot(111)
+    lon_mid=0
+#   proj = Basemap(projection='vandg', lon_0=lon_mid)
+    proj = Basemap(projection='mill', resolution='c', \
+        llcrnrlat=latlim[0], urcrnrlat=latlim[1], \
+        llcrnrlon=lonlim[0], urcrnrlon=lonlim[1],ax=axis)
+    proj.drawcoastlines()
+    # draw parallels and meridians.
+    proj.drawparallels(np.arange(-60, 90, 30), labels=[1, 0, 0, 0])
+    proj.drawmeridians(np.arange(0, 360, 60), labels=[0, 0, 0, 1])
+    x, y=proj(lon, lat)
+    x_str, y_str=proj(lon_str, lat_str)
+    proj.plot(x, y, linewidth=3.5, color='k', linestyle='-')
+    for i in np.arange(0, len(time_vals), time_step):
+        # every timestep
+        proj.plot(x[i], y[i], 'bo', markersize=8)
+        # labelling 
+        if(i % (time_step*label_step) == 0):
+            time_string=time_vals[i].strftime('%H:%M UCT')
+            axis.text(x_str[i], y_str[i], '{0:s}'.format(time_string), \
+                  fontsize=8, fontweight='bold', ha='left', \
+                  bbox={'edgecolor':'w', 'facecolor':'w', 'alpha':0.875, 'pad':0})   
+    # starting point in red
+    proj.plot(x[0], y[0], 'ro', markersize=8)
+    [i.set_linewidth(2) for i in axis.spines.itervalues()]
+    title_str='CloudSat Track\nGranule Number: ' + radarFile[-40:-35]
+    axis.set_title(title_str, fontsize=14, fontweight='bold')
+    return proj
+
+        
 def segment_orbit(X, Xlim):
     '''
     ======================================================================

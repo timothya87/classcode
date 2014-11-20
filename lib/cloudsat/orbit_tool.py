@@ -88,6 +88,9 @@ def draw_orbit_pha(radarFile, lonlim=None, latlim=None, time_step=1000, label_st
     lat, lon, time_vals, time_seconds, dem_elevation = get_geo(radarFile,monotonic_id=1)
     if lonlim is None:
         lonlim=[np.amin(lon),np.amax(lon)]
+        #
+        # basemap requires lons in the range -360 to + 720.
+        #
         if lonlim[0] < -360.:
             lon[:]=lon[:] + 360.
             lonlim=[np.amin(lon),np.amax(lon)]

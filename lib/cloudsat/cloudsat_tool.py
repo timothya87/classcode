@@ -51,7 +51,6 @@ def get_geo(hdfname, monotonic_id=1):
     
     with h5py.File(hdfname,'r') as f:
         root_name=f.keys()[0]
-        print('reading h5 dataset {} root: {}'.format(hdfname,root_name))
         variable_names=['Longitude','Latitude','Profile_time','DEM_elevation']
         var_dict={}
         for var_name in variable_names:

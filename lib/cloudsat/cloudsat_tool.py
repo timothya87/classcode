@@ -66,6 +66,12 @@ def get_geo(hdfname, monotonic_id=1):
         for id in range(0, len(lon)-1):
             if lon[id+1] > lon[id]:
                 lon[id+1] = lon[id+1]-360
+        lonmin=np.amin(lon)
+        #
+        # basemap requires lons in the range -360 - 720 degrees
+        #
+        if lonmin < -360.:
+            lon[:]=lon[:] + 360.
         var_dict['Longitude']=lon
     # ===================================================================== #
     #

@@ -67,7 +67,7 @@ def draw_orbit(radarFile, lonlim=None, latlim=None, time_step=1000, label_step=2
             orientation='portrait', papertype='a4', format='png',
             transparent=True, bbox_inches='tight', pad_inches=0,
             frameon=None)
-    plt.show()
+
 
 def draw_orbit_pha(radarFile, lonlim=None, latlim=None, time_step=1000, label_step=2,fignum=1):
     """
@@ -214,7 +214,67 @@ def draw_CloudSat_1Dvar(lon, lat, time, z, var_name, title_name, fig_name=None):
                     transparent=True, bbox_inches='tight', pad_inches=0, \
                     frameon=None)
     plt.show()
-    
+
+def draw_CloudSat_1Dvar_pha(lon, lat, time, z, var_name, title_name):
+    """
+    ======================================================================
+    Plot the CloudSat 1D var with orbit info.
+    !!! Warnning sometimes not works very well
+    ----------------------------------------------------------------------
+    draw_CloudSat_1Dvar(lon, lat, time, z, var_name, title_name, fig_name):
+    ----------------------------------------------------------------------
+    Input:
+        lon, lat, time: comes from cloudsat_tool.get_geo, time is the datetime object;
+        z: 1-D var to plot;
+        var_name: the name of the variable shows on the figure;
+        title_name: title of the figure;
+    Output:
+        figure instance
+    ======================================================================
+    """
+    from mpl_toolkits.axes_grid1 import host_subplot
+    import mpl_toolkits.axisartist as AA
+    # fig
+    fig=plt.figure(figsize=(10, 5))
+    host = host_subplot(111, axes_class=AA.Axes)
+    fig.subplots_adjust(bottom=0.25)
+    # divide axis
+    par2 = host.twiny()
+    par3 = host.twiny()
+    offset = -25
+    new_fixed_axis = par2.get_grid_helper().new_fixed_axis
+    par2.axis["top"] = new_fixed_axis(loc="bottom", axes=par2, offset=(0, offset))
+    offset = -62.5
+    new_fixed_axis = par3.get_grid_helper().new_fixed_axis
+    par3.axis["top"] = new_fixed_axis(loc="bottom", axes=par3, offset=(0, offset))
+    # label axis
+    host.set_ylabel(var_name)
+    host.set_xlabel('\n\nGeolocation (longitude/latitude)')
+    par3.set_xlabel('Orbit time')
+    # set axis lim
+    par2.set_xlim(lat.min(), lat.max())
+    par3.set_xlim(0, 1)
+    host.set_xlim(lon.min(), lon.max())
+    host.set_ylim(z.min()-0.1*(z.max()-z.min()), z.max()+0.1*(z.max()-z.min()))
+    # plot
+    host.plot(lon, z, linewidth=1.5, linestyle='-', color='k')
+    # labelling ticks
+    host.set_yticks(np.linspace(z.min(), z.max(), 5))
+    host.set_xticks(np.linspace(lon.min(), lon.max(), 6))
+    par2.set_xticks(np.linspace(lat.min(), lat.max(), 6))
+    par2.invert_xaxis()
+    count=0; labels_str=[0] * 6
+    for time_id in np.linspace(0, len(time)-1, 6).astype(int):
+        labels_str[count]=time[time_id].strftime('%H:%M UCT')
+        count+=1
+    par3.set_xticklabels(labels_str)
+    # grid on
+    host.grid()
+    # title
+    host.set_title(title_name, fontsize=14, fontweight='bold')
+    return fig
+
+        
 def draw_CloudSat_2Dvar(lon, lat, height, elev, time, z, CMap, var_name, title_name, fig_name=None):
     """
     ======================================================================
@@ -285,7 +345,72 @@ def draw_CloudSat_2Dvar(lon, lat, height, elev, time, z, CMap, var_name, title_n
                     transparent=True, bbox_inches='tight', pad_inches=0, \
                     frameon=None)
     plt.show()
-    
+
+
+def draw_CloudSat_2Dvar_pha(lon, lat, height, elev, time, z, CMap, var_name,title_name):
+    """
+    ======================================================================
+    Plot the CloudSat 2D var with orbit info.
+    ----------------------------------------------------------------------
+    draw_CloudSat_2Dvar(lon, lat, height, elev, time, z, CMap, var_name, title_name, fig_name):
+    ----------------------------------------------------------------------
+    Input:
+        lat, time: comes from cloudsat_tool.get_geo, time is the datetime object;
+        lon, height, z: 2-D longitude, height and var need to plot;
+        var_name: the name of the variable shows on the figure;
+    Output:
+        figure instance
+    ======================================================================
+    """
+    from mpl_toolkits.axes_grid1 import host_subplot
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+    import mpl_toolkits.axisartist as AA
+    fig=plt.figure(figsize=(15, 5))
+    host = host_subplot(111, axes_class=AA.Axes)
+    # generate a "handle" for the main axis
+    divider=make_axes_locatable(host)
+    #
+    fig.subplots_adjust(bottom=0.25)
+    par2 = host.twiny()
+    par3 = host.twiny()
+    offset = -25
+    new_fixed_axis = par2.get_grid_helper().new_fixed_axis
+    par2.axis["top"] = new_fixed_axis(loc="bottom", axes=par2, offset=(0, offset))
+    offset = -62.5
+    new_fixed_axis = par3.get_grid_helper().new_fixed_axis
+    par3.axis["top"] = new_fixed_axis(loc="bottom", axes=par3, offset=(0, offset))
+    host.set_ylabel('Height ( km )')
+    host.set_xlabel('\n\nGeolocation (longitude/latitude)')
+    par3.set_xlabel('Orbit time')
+    par2.set_xlim(lat.min(), lat.max())
+    par3.set_xlim(0, 1)
+    host.set_xlim(lon.min(), lon.max())
+    host.set_ylim(-5.0, 12.75)
+    # pcolor
+    CS=host.pcolor(lon, height, z, cmap=CMap, vmin=z.min(), vmax=z.max())
+    # divide a place form axis for colorbar
+    CAx=divider.append_axes('right', size='5%', pad=0.75)
+    #
+    CBar=plt.colorbar(CS, cax=CAx)
+    CBar.set_label(var_name, fontsize=12, fontweight='bold')
+    CBar.ax.tick_params(axis='y', length=0)
+    # fill the elev
+    baseline=-5*np.ones(elev.shape).flat[:]
+    host.fill_between(lon[:, 0].flat[:], elev.flat[:], baseline, \
+                      where=elev.flat[:]>=baseline, facecolor=[0.5, 0.5, 0.5], interpolate=False)
+#   host.set_yticks(np.linspace(z.min(), z.max(), 5))
+    host.set_xticks(np.linspace(lon.min(), lon.max(), 6))
+    par2.set_xticks(np.linspace(lat.min(), lat.max(), 6))
+    par2.invert_xaxis()
+    count=0; labels_str=[0] * 6
+    for time_id in np.linspace(0, len(time)-1, 6).astype(int):
+        labels_str[count]=time[time_id].strftime('%H:%M UCT')
+        count+=1
+    par3.set_xticklabels(labels_str)
+    host.grid()
+    host.set_title(title_name, fontsize=14, fontweight='bold')
+    return fig
+        
 
 
 

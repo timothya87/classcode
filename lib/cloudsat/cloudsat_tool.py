@@ -182,30 +182,41 @@ def read_ecmwf(hdfname, maskid=1):
             O3: Ozone mixing ratio, kg/kg, 2-D array
     ======================================================================
     """
+
     with h5py.File(hdfname, 'r') as obj:
-        P=obj['ECMWF-AUX/Data Fields/Pressure'].value.astype(np.float); P=P/Pa2hPa
-        SLP=obj['ECMWF-AUX/Data Fields/Surface_pressure'].value.astype(np.float); SLP=SLP/Pa2hPa
-        T=obj['ECMWF-AUX/Data Fields/Temperature'].value.astype(np.float); T=T- Tc
-        T2m=obj['ECMWF-AUX/Data Fields/Temperature_2m'].value.astype(np.float); T2m=T2m- Tc
-        SKT=obj['ECMWF-AUX/Data Fields/Skin_temperature'].value.astype(np.float); SKT=SKT- Tc
-        q=obj['ECMWF-AUX/Data Fields/Specific_humidity'].value.astype(np.float);
-        O3=obj['ECMWF-AUX/Data Fields/Ozone'].value;
-
-    var_list=[P,SLP,T,T2m,SKT,q,O3]
-
-    def nan_mask(var):
-        var[var < 0] = np.nan
+        P=obj['ECMWF-AUX/Data Fields/Pressure']
+        SLP=obj['ECMWF-AUX/Data Fields/Surface_pressure']
+        T=obj['ECMWF-AUX/Data Fields/Temperature']
+        T2m=obj['ECMWF-AUX/Data Fields/Temperature_2m']
+        SKT=obj['ECMWF-AUX/Data Fields/Skin_temperature']
+        q=obj['ECMWF-AUX/Data Fields/Specific_humidity']
+        O3=obj['ECMWF-AUX/Data Fields/Ozone']
+        var_list=[P,SLP,T,T2m,SKT,q,O3]
+        missing_vals=[item.attrs['missing'].astype(np.float) for item in var_list]
+        var_list=[item.value.astype(np.float) for item in var_list]
+        mask_plus_var=zip(missing_vals,var_list)
+    
+    def nan_mask(mask_val,var):
+        var[var == mask_val] = np.nan
         return var
     
-    def ma_mask(var):
-        var=np.ma.masked_where(var < 0, var)
+    def ma_mask(mask_val,var):
+        var=np.ma.masked_where(var == mask_val, var)
         return var
 
     if maskid == 1:
-        out_vars=[nan_mask(var) for var in var_list]
+        out_vars=[nan_mask(mask_val,var) for mask_val,var in mask_plus_var]
     if maskid == 2:
-        out_vars=[ma_mask(var) for var in var_list]
+        out_vars=[ma_mask(mask_val,var) for mask_val,var in mask_plus_var]
 
+    P,SLP,T,T2m,SKT,q,O3=out_vars
+        
+    P=P/Pa2hPa
+    SLP=SLP/Pa2hPa
+    T=T- Tc
+    T2m=T2m- Tc
+    SKT=SKT- Tc
+        
     return out_vars
     
 def read_rain(hdfname, maskid=1):

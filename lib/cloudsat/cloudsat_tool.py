@@ -112,12 +112,12 @@ def read_radar(hdfname, maskid=1):
             height: height, km
     ======================================================================
     """
-    obj=h5py.File(hdfname, 'r')
-    height=obj['2B-GEOPROF']['Geolocation Fields']['Height'].value.astype(np.float)
-    height=height/1e3
-    reflect=obj['2B-GEOPROF']['Data Fields']['Radar_Reflectivity'].value.astype(np.float)
-    ref_scale=(obj['2B-GEOPROF']['Swath Attributes']['Radar_Reflectivity.factor'].value)[0][0]
-    ref_offset=(obj['2B-GEOPROF']['Swath Attributes']['Radar_Reflectivity.offset'].value)[0][0]
+    with h5py.File(hdfname, 'r') as obj:
+        height=obj['2B-GEOPROF/Geolocation Fields/Height'].value.astype(np.float)
+        height=height/1e3
+        reflect=obj['2B-GEOPROF/Data Fields/Radar_Reflectivity'].value.astype(np.float)
+        ref_scale=(obj['2B-GEOPROF/Swath Attributes/Radar_Reflectivity.factor'].value)[0][0]
+        ref_offset=(obj['2B-GEOPROF/Swath Attributes/Radar_Reflectivity.offset'].value)[0][0]
     reflect=(reflect-ref_offset)/ref_scale
     ref_id=np.logical_or(reflect < -5, reflect > 20)    
     if maskid==1:
@@ -143,10 +143,10 @@ def read_lidar(hdfname, maskid=1):
             LayerBase: lider cloud base height, km
     ======================================================================
     """
-    obj=h5py.File(hdfname, 'r')
-    layerTop=obj['2B-GEOPROF-LIDAR/Data Fields/LayerTop'].value.astype(np.float)
-    layerBase=obj['2B-GEOPROF-LIDAR/Data Fields/LayerBase'].value.astype(np.float)
-    CFrac=obj['2B-GEOPROF-LIDAR/Data Fields/CloudFraction'].value.astype(np.float)
+    with h5py.File(hdfname, 'r') = obj:
+        layerTop=obj['2B-GEOPROF-LIDAR/Data Fields/LayerTop'].value.astype(np.float)
+        layerBase=obj['2B-GEOPROF-LIDAR/Data Fields/LayerBase'].value.astype(np.float)
+        CFrac=obj['2B-GEOPROF-LIDAR/Data Fields/CloudFraction'].value.astype(np.float)
     layerTop=layerTop/1e3
     layerBase=layerBase/1e3
     if maskid == 1:
@@ -180,14 +180,14 @@ def read_ecmwf(hdfname, maskid=1):
             O3: Ozone mixing ratio, kg/kg, 2-D array
     ======================================================================
     """
-    obj=h5py.File(hdfname, 'r')
-    P=obj['ECMWF-AUX/Data Fields/Pressure'].value.astype(np.float); P=P/1e2
-    SLP=obj['ECMWF-AUX/Data Fields/Surface_pressure'].value.astype(np.float); SLP=SLP/1e2
-    T=obj['ECMWF-AUX/Data Fields/Temperature'].value.astype(np.float); T=T-273.16*np.ones(T.shape)
-    T2m=obj['ECMWF-AUX/Data Fields/Temperature_2m'].value.astype(np.float); T2m=T2m-273.16*np.ones(T2m.shape)
-    SKT=obj['ECMWF-AUX/Data Fields/Skin_temperature'].value.astype(np.float); SKT=SKT-273.16*np.ones(SKT.shape)
-    q=obj['ECMWF-AUX/Data Fields/Specific_humidity'].value.astype(np.float);
-    O3=obj['ECMWF-AUX/Data Fields/Ozone'].value;
+    with h5py.File(hdfname, 'r') = obj:
+        P=obj['ECMWF-AUX/Data Fields/Pressure'].value.astype(np.float); P=P/1e2
+        SLP=obj['ECMWF-AUX/Data Fields/Surface_pressure'].value.astype(np.float); SLP=SLP/1e2
+        T=obj['ECMWF-AUX/Data Fields/Temperature'].value.astype(np.float); T=T-273.16*np.ones(T.shape)
+        T2m=obj['ECMWF-AUX/Data Fields/Temperature_2m'].value.astype(np.float); T2m=T2m-273.16*np.ones(T2m.shape)
+        SKT=obj['ECMWF-AUX/Data Fields/Skin_temperature'].value.astype(np.float); SKT=SKT-273.16*np.ones(SKT.shape)
+        q=obj['ECMWF-AUX/Data Fields/Specific_humidity'].value.astype(np.float);
+        O3=obj['ECMWF-AUX/Data Fields/Ozone'].value;
     if maskid == 1:
         P[P < 0]=np.nan
         SLP[SLP < 0]=np.nan
@@ -247,10 +247,10 @@ def read_rain(hdfname, maskid=1):
         precice[preciceRAW == preice_missing]=np.nan
         clw[clwRAW == clw_missing]=np.nan
     if maskid == 2:
-        rain=np.ma.masked_where(rainRAW == -9999, rain)
-        precli=np.ma.masked_where(precliRAW == -9999, precli)
-        precice=np.ma.masked_where(preciceRAW == -9999, precice)
-        clw=np.ma.masked_where(clwRAW == -9999, clw)
+        rain=np.ma.masked_where(rainRAW == rain_missing, rain)
+        precli=np.ma.masked_where(precliRAW == precli_missing, precli)
+        precice=np.ma.masked_where(preciceRAW == preice_missing, precice)
+        clw=np.ma.masked_where(clwRAW == clw_missing, clw)
     return rain, precli, precice, clw
 
 

@@ -224,24 +224,28 @@ def read_rain(hdfname, maskid=1):
             clw: Cloud liquid water content, degC, g/m^3 2-D array
     ======================================================================
     """
-    obj=h5py.File(hdfname, 'r')
-    rainRAW=obj['2C-RAIN-PROFILE/Data Fields/rain_rate'].value.astype(np.float)
-    rain_factor=obj['2C-RAIN-PROFILE/Data Fields/rain_rate'].attrs.values()[0]
-    rain=rainRAW*rain_factor
-    precliRAW=obj['2C-RAIN-PROFILE/Data Fields/precip_liquid_water'].value.astype(np.float)
-    precli_factor=obj['2C-RAIN-PROFILE/Data Fields/precip_liquid_water'].attrs.values()[2]
-    precli=precliRAW*precli_factor
-    preciceRAW=obj['2C-RAIN-PROFILE/Data Fields/precip_ice_water'].value.astype(np.float)
-    precice_factor=obj['2C-RAIN-PROFILE/Data Fields/precip_ice_water'].attrs.values()[2]
-    precice=precliRAW*precli_factor
-    clwRAW=obj['2C-RAIN-PROFILE/Data Fields/cloud_liquid_water'].value.astype(np.float)
-    clw_factor=obj['2C-RAIN-PROFILE/Data Fields/cloud_liquid_water'].attrs.values()[2]
+    with h5py.File(hdfname, 'r') as obj:
+        rainRAW=obj['2C-RAIN-PROFILE/Data Fields/rain_rate'].value.astype(np.float)
+        rain_factor=obj['2C-RAIN-PROFILE/Data Fields/rain_rate'].attrs['factor']
+        rain_missing=obj['2C-RAIN-PROFILE/Data Fields/rain_rate'].attrs['missing']
+        rain=rainRAW*rain_factor
+        precliRAW=obj['2C-RAIN-PROFILE/Data Fields/precip_liquid_water'].value.astype(np.float)
+        precli_factor=obj['2C-RAIN-PROFILE/Data Fields/precip_liquid_water'].attrs['factor']
+        precli_missing=obj['2C-RAIN-PROFILE/Data Fields/precip_liquid_water'].attrs['missing']
+        precli=precliRAW*precli_factor
+        preciceRAW=obj['2C-RAIN-PROFILE/Data Fields/precip_ice_water'].value.astype(np.float)
+        precice_factor=obj['2C-RAIN-PROFILE/Data Fields/precip_ice_water'].attrs['factor']
+        precice_missing=obj['2C-RAIN-PROFILE/Data Fields/precip_ice_water'].attrs['missing']
+        precice=precliRAW*precli_factor
+        clwRAW=obj['2C-RAIN-PROFILE/Data Fields/cloud_liquid_water'].value.astype(np.float)
+        clw_factor=obj['2C-RAIN-PROFILE/Data Fields/cloud_liquid_water'].attrs['factor']
+        clw_missingr=obj['2C-RAIN-PROFILE/Data Fields/cloud_liquid_water'].attrs['missing']
     clw=clwRAW*clw_factor
     if maskid == 1:
-        rain[rainRAW == -9999]=np.nan
-        precli[precliRAW == -9999]=np.nan
-        precice[preciceRAW == -9999]=np.nan
-        clw[clwRAW == -9999]=np.nan
+        rain[rainRAW == rain_missing]=np.nan
+        precli[precliRAW == precli_missing]=np.nan
+        precice[preciceRAW == preice_missing]=np.nan
+        clw[clwRAW == clw_missing]=np.nan
     if maskid == 2:
         rain=np.ma.masked_where(rainRAW == -9999, rain)
         precli=np.ma.masked_where(precliRAW == -9999, precli)

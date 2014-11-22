@@ -116,8 +116,8 @@ def read_radar(hdfname, maskid=1):
         height=obj['2B-GEOPROF/Geolocation Fields/Height'].value.astype(np.float)
         height=height/1e3
         reflect=obj['2B-GEOPROF/Data Fields/Radar_Reflectivity'].value.astype(np.float)
-        ref_scale=(obj['2B-GEOPROF/Swath Attributes/Radar_Reflectivity.factor'].value)[0][0]
-        ref_offset=(obj['2B-GEOPROF/Swath Attributes/Radar_Reflectivity.offset'].value)[0][0]
+        ref_scale=obj['2B-GEOPROF/Data Fields/Radar_Reflectivity'].attrs['factor']
+        ref_offset=obj['2B-GEOPROF/Data Fields/Radar_Reflectivity'].attrs['offset']
     reflect=(reflect-ref_offset)/ref_scale
     ref_id=np.logical_or(reflect < -5, reflect > 20)    
     if maskid==1:

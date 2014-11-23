@@ -1,8 +1,11 @@
+#!/usr/bin/env python
+from __future__ import print_function
 import types
 import h5py
 from modismeta_h5 import parseMeta
 from h5dump import dumph5
 import glob,os
+import argparse
 
 def output_h5(level1b_file,geom_file,output_name):
     """
@@ -57,7 +60,14 @@ def output_h5(level1b_file,geom_file,output_name):
     return None
     
 if __name__ == "__main__":
-    l1b_file=glob.glob("../data/MYD021KM.A2005188.0405.*h5")[0]
-    geom_file=glob.glob("../data/MYD03.A2005188.0405.*h5")[0]
-    output_file='test_output.h5'
-    output_h5(l1b_file,geom_file,output_file)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('l1b21km',  type=str,help='path to Modis Level 1b h5 file (MYD021KM or MOD021KM)')
+    parser.add_argument('geom03',  type=str,help='path to  Modis Level geometry file (MYD03 or MOD03)')
+    parser.add_argument('output', nargs='?', type=str,default='subset.h5',help='path to of h5 output file (will overwrite if exists)')
+    args=parser.parse_args()
+    if os.path.exists(args.output):
+        print("deleting output file {}".format(args.output))
+        os.remove(args.output)
+    l1b_file=glob.glob(args.l1b21km)[0]
+    geom_file=glob.glob(args.geom03)[0]
+    output_h5(l1b_file,geom_file,args.output)

@@ -19,6 +19,7 @@ import h5py
 
 Tc=273.15
 Pa2hPa=1.e2
+m2km=1.e3
 
 def convert_field(void_field):
     """
@@ -88,7 +89,7 @@ def get_geo(hdfname, monotonic_id=1):
     for the_time in var_dict['Profile_time']:
         date_time=orbitStart + datetime.timedelta(seconds=float(the_time))
         time_vals.append(date_time)
-    var_dict['date_day']=time_vals
+    var_dict['date_day']=np.array(time_vals)
     neg_values=var_dict['DEM_elevation'] < 0
     var_dict['DEM_elevation'][neg_values]=0
     #
@@ -98,7 +99,7 @@ def get_geo(hdfname, monotonic_id=1):
     out_list=[var_dict[varname] for varname in variable_names]  
     return out_list
 
-def read_radar(hdfname, maskid=1):
+def read_radar(hdfname, maskid=1,minmax=None):
     """
     ======================================================================
     I/O functions for CloudSat. 2B-GEOPROF radar file
@@ -116,12 +117,14 @@ def read_radar(hdfname, maskid=1):
     """
     with h5py.File(hdfname, 'r') as obj:
         height=obj['2B-GEOPROF/Geolocation Fields/Height'].value.astype(np.float)
-        height=height/1e3
+        height=height/m2km
         reflect=obj['2B-GEOPROF/Data Fields/Radar_Reflectivity'].value.astype(np.float)
         ref_scale=obj['2B-GEOPROF/Data Fields/Radar_Reflectivity'].attrs['factor']
         ref_offset=obj['2B-GEOPROF/Data Fields/Radar_Reflectivity'].attrs['offset']
     reflect=(reflect-ref_offset)/ref_scale
-    ref_id=np.logical_or(reflect < -5, reflect > 20)    
+    if minmax is None:
+        minmax=[-5,20]
+    ref_id=np.logical_or(reflect < minmax[0], reflect > minmax[1])    
     if maskid==1:
         reflect[ref_id]=np.nan
     if maskid==2:
@@ -149,8 +152,8 @@ def read_lidar(hdfname, maskid=1):
         layerTop=obj['2B-GEOPROF-LIDAR/Data Fields/LayerTop'].value.astype(np.float)
         layerBase=obj['2B-GEOPROF-LIDAR/Data Fields/LayerBase'].value.astype(np.float)
         CFrac=obj['2B-GEOPROF-LIDAR/Data Fields/CloudFraction'].value.astype(np.float)
-    layerTop=layerTop/1e3
-    layerBase=layerBase/1e3
+    layerTop=layerTop/m2km
+    layerBase=layerBase/m2km
     if maskid == 1:
         layerTop[layerTop < 0]=np.nan
         layerTop[layerBase < 0]=np.nan
@@ -192,10 +195,10 @@ def read_ecmwf(hdfname, maskid=1):
         q=obj['ECMWF-AUX/Data Fields/Specific_humidity']
         O3=obj['ECMWF-AUX/Data Fields/Ozone']
         var_list=[P,SLP,T,T2m,SKT,q,O3]
-        missing_vals=[item.attrs['missing'].astype(np.float) for item in var_list]
-        var_list=[item.value.astype(np.float) for item in var_list]
+        missing_vals=[item.attrs['missing'] for item in var_list]
+        var_list=[item.value for item in var_list]
         mask_plus_var=zip(missing_vals,var_list)
-    
+        
     def nan_mask(mask_val,var):
         var[var == mask_val] = np.nan
         return var
@@ -208,16 +211,17 @@ def read_ecmwf(hdfname, maskid=1):
         out_vars=[nan_mask(mask_val,var) for mask_val,var in mask_plus_var]
     if maskid == 2:
         out_vars=[ma_mask(mask_val,var) for mask_val,var in mask_plus_var]
+ 
+    var_list=[item.astype(np.float) for item in out_vars]
 
-    P,SLP,T,T2m,SKT,q,O3=out_vars
-        
+    P,SLP,T,T2m,SKT,q,O3=var_list
     P=P/Pa2hPa
     SLP=SLP/Pa2hPa
     T=T- Tc
     T2m=T2m- Tc
     SKT=SKT- Tc
         
-    return out_vars
+    return P,SLP,T,T2m,SKT,q,O3
     
 def read_rain(hdfname, maskid=1):
     """
